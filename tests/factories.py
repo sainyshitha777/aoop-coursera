@@ -1,37 +1,19 @@
-class ProductFactory(factory.Factory):
-    """Creates fake products for testing"""
+import factory
+from faker import Faker
+from your_app.models import Product  # Replace `your_app` with your app name
 
+fake = Faker()
+
+class ProductFactory(factory.django.DjangoModelFactory):
     class Meta:
-        """Maps factory to data model"""
+        model = Product  # Replace `Product` with your actual model name
 
-        model = Product
+    name = factory.LazyAttribute(lambda _: fake.word())
+    description = factory.LazyAttribute(lambda _: fake.text(max_nb_chars=200))
+    price = factory.LazyAttribute(lambda _: round(fake.pyfloat(left_digits=3, right_digits=2, positive=True), 2))
+    stock = factory.LazyAttribute(lambda _: fake.random_int(min=0, max=1000))
+    created_at = factory.LazyAttribute(lambda _: fake.date_time_this_year())
 
-    id = factory.Sequence(lambda n: n)
-    name = FuzzyChoice(
-        choices=[
-            "Hat",
-            "Pants",
-            "Shirt",
-            "Apple",
-            "Banana",
-            "Pots",
-            "Towels",
-            "Ford",
-            "Chevy",
-            "Hammer",
-            "Wrench"
-        ]
-    )
-    description = factory.Faker("text")
-    price = FuzzyDecimal(0.5, 2000.0, 2)
-    available = FuzzyChoice(choices=[True, False])
-    category = FuzzyChoice(
-        choices=[
-            Category.UNKNOWN,
-            Category.CLOTHS,
-            Category.FOOD,
-            Category.HOUSEWARES,
-            Category.AUTOMOTIVE,
-            Category.TOOLS,
-        ]
-    )
+# Example usage:
+# product = ProductFactory()
+# print(product.name, product.price)
